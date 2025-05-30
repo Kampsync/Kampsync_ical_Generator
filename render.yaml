@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: kampsync-ical-service
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: XANO_API_BASE_URL
+        value: https://your-xano-api.com
