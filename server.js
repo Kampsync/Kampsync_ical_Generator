@@ -13,7 +13,7 @@ app.get('/calendar/:listingId.ics', async (req, res) => {
 
   try {
     // Fetch booking events from Xano
-    const response = await axios.get(`${XANO_API_BASE_URL}/booking_events`, {
+    const response = await axios.get(`${XANO_API_BASE_URL}`, {
       params: { listing_id: listingId },
     });
 
