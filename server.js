@@ -34,9 +34,12 @@ app.get('/calendar/:listingId.ics', async (req, res) => {
       });
     });
 
-    // Set headers and send the calendar
-    res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
-    res.send(calendar.toString());
+    // Force calendar to render inline (not download)
+res.set({
+  'Content-Type': 'text/calendar; charset=utf-8',
+  'Content-Disposition': 'inline'
+});
+res.send(calendar.toString());
   } catch (error) {
     console.error('Error fetching booking events:', error);
     res.status(500).send('Internal Server Error');
