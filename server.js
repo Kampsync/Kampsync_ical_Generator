@@ -31,7 +31,6 @@ app.get('/calendar/:listingId.ics', async (req, res) => {
         uid: booking.id.toString(),
         location: booking.location || '',
         description: booking.description || '',
-        location: booking.location || '',
       });
     });
 
