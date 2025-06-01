@@ -25,12 +25,13 @@ app.get('/calendar/:listingId.ics', async (req, res) => {
     // Add events to the calendar
     bookings.forEach((booking) => {
       calendar.createEvent({
+        summary: booking.summary || 'Booking',
         start: new Date(booking.start_date),
         end: new Date(booking.end_date),
-        summary: booking.summary || 'Booking',
+        uid: booking.id.toString(),
+        location: booking.location || '',
         description: booking.description || '',
         location: booking.location || '',
-        uid: booking.id.toString(),
       });
     });
 
