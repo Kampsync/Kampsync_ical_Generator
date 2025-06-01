@@ -35,8 +35,7 @@ app.get('/calendar/:listingId.ics', async (req, res) => {
     });
 
     // Set headers and send the calendar
-res.set('Content-Type', 'text/calendar; charset=utf-8');
-res.send(calendar.toString());
+res.type('text/calendar');
   } catch (error) {
     console.error('Error fetching booking events:', error);
     res.status(500).send('Internal Server Error');
