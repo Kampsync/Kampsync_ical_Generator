@@ -11,8 +11,11 @@ app.get('/calendar/:listingId.ics', async (req, res) => {
 
   try {
     const { data: bookings } = await axios.get(XANO_API_BASE_URL, {
-      params: { listing_id: listingId },
-    });
+  params: { listing_id: listingId },
+  headers: {
+    Authorization: `Bearer ${process.env.XANO_API_KEY}`
+  }
+});
 
     const calendar = ical({ name: `KampSync Listing ${listingId}` });
 
