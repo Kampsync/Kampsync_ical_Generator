@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "axios": "^1.6.7",
-    "ical-generator": "^6.0.3",
+    "ical-generator": "^6.0.0",
     "express": "^4.19.2"
   }
 }
