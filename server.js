@@ -1,44 +1,23 @@
-const express = require('express');
 const ical = require('ical-generator');
-const axios = require('axios');
-const app = express();
+const http = require('http');
 
-const PORT = process.env.PORT || 3000;
-const XANO_API_BASE_URL = process.env.XANO_API_BASE_URL;
+const calendar = ical({ name: 'My Calendar' });
 
-app.get('/calendar/:listingId.ics', async (req, res) => {
-  const { listingId } = req.params;
-
-  try {
-    const { data: bookings } = await axios.get(XANO_API_BASE_URL, {
-  params: { listing_id: listingId },
-  headers: {
-    Authorization: `Bearer ${process.env.XANO_API_KEY}`
-  }
+calendar.createEvent({
+  start: new Date(),
+  end: new Date(new Date().getTime() + 60 * 60 * 1000), // 1 hour later
+  summary: 'Sample Event',
+  description: 'This is a sample event.',
+  location: 'Online',
+  url: 'http://example.com/',
 });
 
-    const calendar = ical({ name: `KampSync Listing ${listingId}` });
-
-    bookings.forEach((booking) => {
-      calendar.createEvent({
-        start: new Date(booking.start_date),
-        end: new Date(booking.end_date),
-        summary: booking.summary || 'Booking',
-        description: booking.description || '',
-        location: booking.location || '',
-        uid: booking.id.toString(),
-      });
-    });
-
-    res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
-    res.setHeader('Content-Disposition', 'inline; filename="listing.ics"');
-    res.send(calendar.toString());
-  } catch (err) {
-    console.error("Calendar generation error:", err.message || err);
-    res.status(500).send('Internal Server Error');
-  }
-});
-
-app.listen(PORT, () => {
-  console.log(`KampSync iCal service running on port ${PORT}`);
+http.createServer((req, res) => {
+  res.writeHead(200, {
+    'Content-Type': 'text/calendar; charset=utf-8',
+    'Content-Disposition': 'attachment; filename="calendar.ics"',
+  });
+  res.end(calendar.toString());
+}).listen(3000, () => {
+  console.log('Server running at http://localhost:3000/');
 });
