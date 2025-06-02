@@ -31,7 +31,7 @@ app.get('/calendar/:listingId.ics', async (req, res) => {
     res.setHeader('Content-Disposition', 'inline; filename="listing.ics"');
     res.send(calendar.toString());
   } catch (err) {
-    console.error('Calendar error:', err.message);
+    console.error("Calendar generation error:", err.message || err);
     res.status(500).send('Internal Server Error');
   }
 });
