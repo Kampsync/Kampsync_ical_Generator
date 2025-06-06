@@ -59,6 +59,11 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
   bookingLink = 'View this booking by logging into your Hipcamp host dashboard.';
     }
 
+    // Camplify
+    if (platform?.includes('camplify')) {
+  bookingLink = 'Log in to your Camplify host dashboard to view booking details.';
+    }
+
 
 
   }
