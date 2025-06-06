@@ -54,6 +54,12 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
   bookingLink = 'https://www.airbnb.com/hosting/reservations';
     }
 
+    // Hipcamp
+    if (platform?.includes('hipcamp')) {
+  bookingLink = 'View this booking by logging into your Hipcamp host dashboard.';
+    }
+
+
 
   }
 
