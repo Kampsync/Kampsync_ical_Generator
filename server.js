@@ -49,6 +49,12 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
   bookingLink = `https://www.rvezy.com/owner/reservations/${rawUID}`;
     }
 
+    // Airbnb
+    if (platform?.includes('airbnb')) {
+  bookingLink = 'https://www.airbnb.com/hosting/reservations';
+    }
+
+
   }
 
 
