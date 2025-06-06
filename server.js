@@ -22,7 +22,7 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
 
     const calendar = ical({ name: `KampSync Listing ${listingId}` });
 
-    bookings.forEach((booking) => {
+   bookings.forEach((booking) => {
   // Generate stable UID
   const uuidNamespace = '2f1d3dfc-b806-4542-996c-e6f27f1d9a17'; // Replace with your own UUID namespace
   const uid = uuidv5(`${listingId}-${booking.uid}`, uuidNamespace);
@@ -32,12 +32,12 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
   const rawUID = booking.uid || '';
   let bookingLink = '';
 
-
+  // RVshare (leave unchanged)
   if (platform?.includes('rvshare') && rawUID.length > 10 && !rawUID.includes('Booking')) {
     bookingLink = `https://rvshare.com/dashboard/reservations`;
   }
 
-  
+  // Outdoorsy (leave unchanged)
   if (platform?.includes('outdoorsy') && rawUID.includes('Booking')) {
     const match = rawUID.match(/(\d{6,})/);
     if (match) {
@@ -46,35 +46,33 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
   }
 
   // RVezy reservation page
-  if (platform?.includes('rvezy') && rawUID.length > 10) {
+  else if (platform?.includes('rvezy') && rawUID.length > 10) {
     bookingLink = `https://www.rvezy.com/owner/reservations/${rawUID}`;
   }
 
   // Airbnb fallback to dashboard
-  if (platform?.includes('airbnb')) {
+  else if (platform?.includes('airbnb')) {
     bookingLink = 'https://www.airbnb.com/hosting/reservations';
   }
 
   // Hipcamp dashboard
-  if (platform?.includes('hipcamp')) {
+  else if (platform?.includes('hipcamp')) {
     bookingLink = 'https://www.hipcamp.com/host/dashboard/calendar';
   }
 
   // Camplify dashboard
-  if (platform?.includes('camplify')) {
+  else if (platform?.includes('camplify')) {
     bookingLink = 'https://www.camplify.com.au/dashboard/bookings';
   }
 
   // Yescapa dashboard
-  if (platform?.includes('yescapa')) {
+  else if (platform?.includes('yescapa')) {
     bookingLink = 'https://www.yescapa.com/dashboard/bookings';
   }
 
-  // ... (your existing calendar.createEvent and summary/description code follows)
+  // Now you can proceed with calendar.createEvent below
 });
-
-
-      
+ 
       const summary = [booking.source_platform, booking.summary].filter(Boolean).join(', ') || 'booking';
       const descriptionParts = [];
       if (booking.description) descriptionParts.push(booking.description);
