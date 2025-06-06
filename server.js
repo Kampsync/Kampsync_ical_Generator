@@ -42,6 +42,12 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
           bookingLink = `https://www.outdoorsy.com/dashboard/bookings/${match[1]}`;
         }
       }
+      
+      const summary = [booking.source_platform, booking.summary].filter(Boolean).join(', ') || 'booking';
+      const descriptionParts = [];
+      if (booking.description) descriptionParts.push(booking.description);
+      if (bookingLink) descriptionParts.push(`Booking Link: ${bookingLink}`);
+      const description = descriptionParts.join('\n');
 
       calendar.createEvent({
         start: booking.start_date,
