@@ -64,9 +64,11 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
   bookingLink = 'Log in to your Camplify host dashboard to view booking details.';
     }
 
-
-
-  }
+    // Yescapa
+    if (platform?.includes('yescapa')) {
+  bookingLink = 'Log in to your Yescapa dashboard to view booking details.';
+    }
+}
 
 
  
