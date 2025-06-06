@@ -27,6 +27,22 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
       const uuidNamespace = '2f1d3dfc-b806-4542-996c-e6f27f1d9a17'; // Replace with your own UUID namespace
       const uid = uuidv5(`${listingId}-${booking.uid}`, uuidNamespace);
 
+      // Generate link if possible
+      const platform = booking.source_platform?.toLowerCase();
+      const rawUID = booking.uid || '';
+      let bookingLink = '';
+
+      if (platform?.includes('rvshare') && rawUID.length > 10 && !rawUID.includes('Booking')) {
+        bookingLink = `https://rvshare.com/dashboard/reservations/${rawUID}`;
+      }
+
+      if (platform?.includes('outdoorsy') && rawUID.includes('Booking')) {
+        const match = rawUID.match(/(\d{6,})/);
+        if (match) {
+          bookingLink = `https://www.outdoorsy.com/dashboard/bookings/${match[1]}`;
+        }
+      }
+
       calendar.createEvent({
         start: booking.start_date,
         end: booking.end_date,
