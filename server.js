@@ -43,6 +43,12 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
     if (match) {
       bookingLink = `https://www.outdoorsy.com/dashboard/bookings/${match[1]}`;
     }
+
+    // Rvezy 
+    if (platform?.includes('rvezy') && rawUID.length > 10) {
+  bookingLink = `https://www.rvezy.com/owner/reservations/${rawUID}`;
+    }
+
   }
 
 
