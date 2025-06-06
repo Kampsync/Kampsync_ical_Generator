@@ -32,12 +32,12 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
   const rawUID = booking.uid || '';
   let bookingLink = '';
 
-  // RVshare (leave unchanged)
+  // RVshare 
   if (platform?.includes('rvshare') && rawUID.length > 10 && !rawUID.includes('Booking')) {
     bookingLink = `https://rvshare.com/dashboard/reservations`;
   }
 
-  // Outdoorsy (leave unchanged)
+  // Outdoorsy 
   if (platform?.includes('outdoorsy') && rawUID.includes('Booking')) {
     const match = rawUID.match(/(\d{6,})/);
     if (match) {
