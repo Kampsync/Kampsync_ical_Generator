@@ -43,6 +43,33 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
         }
       }
       
+      // RVezy booking link — if UID is present
+if (platform?.includes('rvezy') && rawUID.length > 10) {
+  bookingLink = `https://www.rvezy.com/owner/reservations/${rawUID}`;
+}
+
+// Airbnb — no unique reservation URLs without API access, so fallback to dashboard
+if (platform?.includes('airbnb')) {
+  bookingLink = 'https://www.airbnb.com/hosting/reservations';
+}
+
+// Hipcamp (no UID-based URL, just calendar/dashboard)
+if (platform?.includes('hipcamp')) {
+  bookingLink = 'https://www.hipcamp.com/host/dashboard/calendar';
+}
+
+// Camplify (dashboard link)
+if (platform?.includes('camplify')) {
+  bookingLink = 'https://www.camplify.com.au/dashboard/bookings';
+}
+
+// Yescapa (dashboard link)
+if (platform?.includes('yescapa')) {
+  bookingLink = 'https://www.yescapa.com/dashboard/bookings';
+}
+    }
+
+      
       const summary = [booking.source_platform, booking.summary].filter(Boolean).join(', ') || 'booking';
       const descriptionParts = [];
       if (booking.description) descriptionParts.push(booking.description);
