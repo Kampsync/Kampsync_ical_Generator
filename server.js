@@ -31,11 +31,11 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
         start: booking.start_date,
         end: booking.end_date,
         summary: booking.summary || 'booking',
-        description: booking.description || '',
+        description: [booking.description, booking.source_platform && `Platform: ${booking.source_platform}`].filter(Boolean).join('\n'),
         location: booking.location || '',
         uid,
         sequence: 1,
-        allDay: true // Forces Google Calendar to drop time prefix and treat this as full-day
+        allDay: false
       });
     });
 
