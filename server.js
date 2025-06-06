@@ -33,7 +33,7 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
       let bookingLink = '';
 
       if (platform?.includes('rvshare') && rawUID.length > 10 && !rawUID.includes('Booking')) {
-        bookingLink = `https://rvshare.com/dashboard/reservations/${rawUID}`;
+        bookingLink = `https://rvshare.com/dashboard/reservations`;
       }
 
       if (platform?.includes('outdoorsy') && rawUID.includes('Booking')) {
