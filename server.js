@@ -35,7 +35,7 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
         location: booking.location || '',
         uid,
         sequence: 1,
-        allDay: false
+        allDay: true
       });
     });
 
