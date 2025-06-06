@@ -22,8 +22,9 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
     const calendar = ical({ name: `KampSync Listing ${listingId}` });
 
     bookings.forEach((booking) => {
-      const start = new Date(booking.start_date);
-      const end = new Date(booking.end_date);
+     const start = new Date(`${booking.start_date}T00:00:00Z`);
+      const end = new Date(`${booking.end_date}T00:00:00Z`);
+
 
       const uidNamespace = '21d3d7af-b806-4d2d-99c2-e6f2fddaa1f7'; // Use a fixed namespace you control
       const uid = uuidv5(`${listingId}|${booking.uid}`, uidNamespace);
