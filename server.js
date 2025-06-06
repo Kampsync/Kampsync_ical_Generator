@@ -14,22 +14,22 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
   }
 
   try {
-    const { data: bookings } = await axios.get(`${XANO_API_BASE_URL}`, {
+    const { data: bookings } = await axios.get(XANO_API_BASE_URL, {
       params: { listing_id: listingId }
     });
 
     const calendar = ical({ name: `KampSync Listing ${listingId}` });
 
     bookings.forEach((booking) => {
-      const start = new Date(booking.start_date);
+      const start = booking.start_date.split('T')[0]; // 'YYYY-MM-DD'
       const end = new Date(booking.end_date);
-
-      // Fix: Add time to end date so Google shows the full day
-      end.setHours(23, 59, 59, 999);
+      end.setDate(end.getDate() + 1); // Google Calendar excludes end date, so add 1
+      const endFormatted = end.toISOString().split('T')[0]; // 'YYYY-MM-DD'
 
       calendar.createEvent({
         start,
-        end,
+        end: endFormatted,
+        allDay: true,
         summary: booking.summary || 'booking',
         description: booking.description || '',
         location: booking.location || '',
@@ -38,10 +38,10 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
     });
 
     res.setHeader('Content-Type', 'text/calendar');
-    res.setHeader('Content-Disposition', `inline; filename=listing_${listingId}.ics`);
+    res.setHeader('Content-Disposition', `inline; filename=listing-${listingId}.ics`);
     res.send(calendar.toString());
   } catch (err) {
-    console.error('calendar generation error:', err.message || err);
+    console.error('Calendar generation error:', err.message || err);
     res.status(500).send('Internal Server Error');
   }
 });
