@@ -23,58 +23,56 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
     const calendar = ical({ name: `KampSync Listing ${listingId}` });
 
     bookings.forEach((booking) => {
-      // Generate stable UID
-      const uuidNamespace = '2f1d3dfc-b806-4542-996c-e6f27f1d9a17'; // Replace with your own UUID namespace
-      const uid = uuidv5(`${listingId}-${booking.uid}`, uuidNamespace);
+  // Generate stable UID
+  const uuidNamespace = '2f1d3dfc-b806-4542-996c-e6f27f1d9a17'; // Replace with your own UUID namespace
+  const uid = uuidv5(`${listingId}-${booking.uid}`, uuidNamespace);
 
-      // Generate link if possible
-      const platform = booking.source_platform?.toLowerCase();
-      const rawUID = booking.uid || '';
-      let bookingLink = '';
+  // Generate link if possible
+  const platform = booking.source_platform?.toLowerCase();
+  const rawUID = booking.uid || '';
+  let bookingLink = '';
 
-      if (platform?.includes('rvshare') && rawUID.length > 10 && !rawUID.includes('Booking')) {
-        bookingLink = `https://rvshare.com/dashboard/reservations`;
-      }
 
-      if (platform?.includes('outdoorsy') && rawUID.includes('Booking')) {
-        const match = rawUID.match(/(\d{6,})/);
-        if (match) {
-          bookingLink = `https://www.outdoorsy.com/dashboard/bookings/${match[1]}`;
-        }
-      
-      
-   // Outdoorsy reservation page
-if (platform.includes('outdoorsy') && rawUID.includes('Booking')) 
-  const match = rawUID.match(/(\d{6,})/);
-  if (match) {
-    bookingLink = `https://www.outdoorsy.com/dashboard/bookings/${match[1]}`;
+  if (platform?.includes('rvshare') && rawUID.length > 10 && !rawUID.includes('Booking')) {
+    bookingLink = `https://rvshare.com/dashboard/reservations`;
   }
 
-// RVezy reservation page
-if (platform.includes('rvezy') && rawUID.length > 10) {
-  bookingLink = `https://www.rvezy.com/owner/reservations/${rawUID}`;
-}
-
-// Airbnb fallback to dashboard
-if (platform.includes('airbnb')) {
-  bookingLink = 'https://www.airbnb.com/hosting/reservations';
-}
-
-// Hipcamp dashboard
-if (platform.includes('hipcamp')) {
-  bookingLink = 'https://www.hipcamp.com/host/dashboard/calendar';
-}
-
-// Camplify dashboard
-if (platform.includes('camplify')) {
-  bookingLink = 'https://www.camplify.com.au/dashboard/bookings';
-}
-
-// Yescapa dashboard
-if (platform.includes('yescapa')) {
-  bookingLink = 'https://www.yescapa.com/dashboard/bookings';
-}
+  
+  if (platform?.includes('outdoorsy') && rawUID.includes('Booking')) {
+    const match = rawUID.match(/(\d{6,})/);
+    if (match) {
+      bookingLink = `https://www.outdoorsy.com/dashboard/bookings/${match[1]}`;
     }
+  }
+
+  // RVezy reservation page
+  if (platform?.includes('rvezy') && rawUID.length > 10) {
+    bookingLink = `https://www.rvezy.com/owner/reservations/${rawUID}`;
+  }
+
+  // Airbnb fallback to dashboard
+  if (platform?.includes('airbnb')) {
+    bookingLink = 'https://www.airbnb.com/hosting/reservations';
+  }
+
+  // Hipcamp dashboard
+  if (platform?.includes('hipcamp')) {
+    bookingLink = 'https://www.hipcamp.com/host/dashboard/calendar';
+  }
+
+  // Camplify dashboard
+  if (platform?.includes('camplify')) {
+    bookingLink = 'https://www.camplify.com.au/dashboard/bookings';
+  }
+
+  // Yescapa dashboard
+  if (platform?.includes('yescapa')) {
+    bookingLink = 'https://www.yescapa.com/dashboard/bookings';
+  }
+
+  // ... (your existing calendar.createEvent and summary/description code follows)
+});
+
 
       
       const summary = [booking.source_platform, booking.summary].filter(Boolean).join(', ') || 'booking';
