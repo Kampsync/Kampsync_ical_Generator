@@ -30,7 +30,7 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
       calendar.createEvent({
         start: booking.start_date,
         end: booking.end_date,
-        summary: [booking.source_platform  , booking.summary] || 'booking',
+        summary: [booking.source_platform, 'booking.summary] || 'booking',
         description: [booking.description, booking.source_platform && `Platform: ${booking.source_platform}`].filter(Boolean).join('\n'),
         location: booking.location || '',
         uid,
