@@ -1,7 +1,7 @@
 const express = require('express');
 const axios = require('axios');
 const ical = require('ical-generator');
-const { v5: uuidv5 } = require('uuid'); // Add this package to generate consistent UUIDs
+const { v5: uuidv5 } = require('uuid'); // UUID v5 for consistent UID generation
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -25,13 +25,8 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
       const start = new Date(booking.start_date);
       const end = new Date(booking.end_date);
 
-      // Ensure full-day coverage by setting start to 00:00:00 and end to 23:59:59 UTC
-      start.setUTCHours(0, 0, 0, 0);
-      end.setUTCHours(23, 59, 59, 999);
-
-      // Generate a deterministic UUID using listing ID and booking UID for consistency
-      const uidNamespace = '2d1a697c-b0d0-45d2-9b9e-e6571f1a6a17'; // Replace with your own UUID namespace
-      const uid = uuidv5(`${listingId}-${booking.uid}`, uidNamespace);
+      const uidNamespace = '21d3d7af-b806-4d2d-99c2-e6f2fddaa1f7'; // Use a fixed namespace you control
+      const uid = uuidv5(`${listingId}|${booking.uid}`, uidNamespace);
 
       calendar.createEvent({
         start,
@@ -40,7 +35,7 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
         description: booking.description || '',
         location: booking.location || '',
         uid,
-        sequence: 1, // Static for now — increment if event data is edited in future
+        sequence: 1
       });
     });
 
