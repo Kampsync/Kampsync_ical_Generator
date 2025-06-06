@@ -45,33 +45,7 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
     }
   }
 
-  // RVezy reservation page
-  else if (platform?.includes('rvezy') && rawUID.length > 10) {
-    bookingLink = `https://www.rvezy.com/owner/reservations/${rawUID}`;
-  }
 
-  // Airbnb fallback to dashboard
-  else if (platform?.includes('airbnb')) {
-    bookingLink = 'https://www.airbnb.com/hosting/reservations';
-  }
-
-  // Hipcamp dashboard
-  else if (platform?.includes('hipcamp')) {
-    bookingLink = 'https://www.hipcamp.com/host/dashboard/calendar';
-  }
-
-  // Camplify dashboard
-  else if (platform?.includes('camplify')) {
-    bookingLink = 'https://www.camplify.com.au/dashboard/bookings';
-  }
-
-  // Yescapa dashboard
-  else if (platform?.includes('yescapa')) {
-    bookingLink = 'https://www.yescapa.com/dashboard/bookings';
-  }
-
-  // Now you can proceed with calendar.createEvent below
-});
  
       const summary = [booking.source_platform, booking.summary].filter(Boolean).join(', ') || 'booking';
       const descriptionParts = [];
