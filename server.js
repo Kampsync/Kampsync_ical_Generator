@@ -31,7 +31,7 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
         start: booking.start_date,
         end: booking.end_date,
         summary: `${booking.source_platform}, ${booking.summary}` || 'booking',
-        description: [booking.description, booking.source_platform && `Platform: ${booking.source_platform}`].filter(Boolean).join('\n'),
+        description: `${booking.description || ''}${bookingLink ? `\nBooking Link: ${bookingLink}` : ''}`,
         location: booking.location || '',
         uid,
         sequence: 1,
