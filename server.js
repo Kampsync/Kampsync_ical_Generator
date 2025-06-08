@@ -93,9 +93,11 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
     
     // Save Render .ics link to Xano
 try {
-  const renderUrl = `https://kampsync-ical-generator.onrender.com/api/calendar/${listingId}.ics`;
+  const XANO_API_POST_RENDER_ICAL
+ = `https://kampsync-ical-generator.onrender.com/api/calendar/${listingId}.ics`;
 
-  await axios.post(`${XANO_API_BASE_URL}/save_render_ical`, {
+  await axios.post(`${XANO_API_POST_RENDER_ICAL
+}/save_render_ical`, {
     listing_id: listingId,
     ical_data: renderUrl
   });
