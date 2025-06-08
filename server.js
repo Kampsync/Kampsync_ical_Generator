@@ -93,14 +93,15 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
     
     // Save Render .ics link to Xano
 try {
-  const XANO_API_POST_RENDER_ICAL
- = `https://kampsync-ical-generator.onrender.com/api/calendar/${listingId}.ics`;
+ const XANO_API_POST_RENDER_ICAL = process.env.XANO_API_POST_RENDER_ICAL;
 
-  await axios.post(`${XANO_API_POST_RENDER_ICAL
-}/save_render_ical`, {
-    listing_id: listingId,
-    ical_data: renderUrl
-  });
+const renderUrl = `https://kampsync-ical-generator.onrender.com/api/calendar/${listingId}.ics`;
+
+await axios.post(XANO_API_POST_RENDER_ICAL, {
+  listing_id: listingId,
+  ical_data: renderUrl
+});
+
 } catch (xanoErr) {
   console.error('Failed to update Xano ical_data:', xanoErr.message || xanoErr);
 }
