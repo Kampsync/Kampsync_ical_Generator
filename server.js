@@ -90,6 +90,19 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
       });
     });
 
+    
+    // Save Render .ics link to Xano
+try {
+  const renderUrl = `https://kampsync-ical-generator.onrender.com/api/calendar/${listingId}.ics`;
+
+  await axios.post(`${XANO_API_BASE_URL}/save_render_ical`, {
+    listing_id: listingId,
+    ical_data: renderUrl
+  });
+} catch (xanoErr) {
+  console.error('Failed to update Xano ical_data:', xanoErr.message || xanoErr);
+}
+
     res.setHeader('Content-Type', 'text/calendar');
     res.setHeader('Content-Disposition', `inline; filename=listing_${listingId}.ics`);
     res.send(calendar.toString());
