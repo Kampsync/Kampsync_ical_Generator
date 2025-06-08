@@ -73,16 +73,20 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
 
     // Push render .ics URL to Xano
     if (!XANO_API_POST_RENDER_ICAL) {
-      console.warn('Missing POST URL for Xano update, skipping...');
+      console.warn('⚠️ Missing POST URL for Xano update, skipping...');
     } else {
       const renderUrl = `https://kampsync-ical-generator.onrender.com/api/calendar/${listingId}.ics`;
+      console.log('📤 Posting to Xano:', XANO_API_POST_RENDER_ICAL);
+      console.log('🧾 Payload:', { listing_id: listingId, ical_data: renderUrl });
+
       try {
         await axios.post(XANO_API_POST_RENDER_ICAL, {
           listing_id: listingId,
           ical_data: renderUrl
         });
-      } catch (xanoErr) {
-        console.error('Failed to update Xano ical_data:', xanoErr.message || xanoErr);
+        console.log('✅ Successfully updated Xano ical_data');
+      } catch (err) {
+        console.error('❌ Failed to post to Xano:', err.response?.data || err.message);
       }
     }
 
