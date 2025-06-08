@@ -81,7 +81,7 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
 
       try {
         await axios.post(XANO_API_POST_RENDER_ICAL, {
-          listing_id: listing_id: parseInt(listingId, 10),
+          listing_id: parseInt(listingId, 10),
           ical_data: renderUrl
         });
         console.log('✅ Successfully updated Xano ical_data');
