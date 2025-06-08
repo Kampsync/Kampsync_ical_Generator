@@ -7,6 +7,7 @@ const app = express();
 
 const PORT = process.env.PORT || 3000;
 const XANO_API_BASE_URL = process.env.XANO_API_BASE_URL;
+const XANO_API_POST_RENDER_ICAL = process.env.XANO_API_POST_RENDER_ICAL;
 
 app.get('/api/calendar/:listingId.ics', async (req, res) => {
   const { listingId } = req.params;
@@ -22,56 +23,36 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
 
     const calendar = ical({ name: `KampSync Listing ${listingId}` });
 
-   bookings.forEach((booking) => {
-  // Generate stable UID
-  const uuidNamespace = '2f1d3dfc-b806-4542-996c-e6f27f1d9a17'; // Replace with your own UUID namespace
-  const uid = uuidv5(`${listingId}-${booking.uid}`, uuidNamespace);
+    bookings.forEach((booking) => {
+      const uuidNamespace = '2f1d3dfc-b806-4542-996c-e6f27f1d9a17';
+      const uid = uuidv5(`${listingId}-${booking.uid}`, uuidNamespace);
+      const platform = booking.source_platform?.toLowerCase();
+      const rawUID = booking.uid || '';
+      let bookingLink = '';
 
-  // Generate link if possible
-  const platform = booking.source_platform?.toLowerCase();
-  const rawUID = booking.uid || '';
-  let bookingLink = '';
+      if (platform?.includes('rvshare') && rawUID.length > 10 && !rawUID.includes('Booking')) {
+        bookingLink = `https://rvshare.com/dashboard/reservations`;
+      }
+      if (platform?.includes('outdoorsy') && rawUID.includes('Booking')) {
+        const match = rawUID.match(/(\d{6,})/);
+        if (match) bookingLink = `https://www.outdoorsy.com/dashboard/bookings/${match[1]}`;
+      }
+      if (platform?.includes('rvezy') && rawUID.length > 10) {
+        bookingLink = `https://www.rvezy.com/owner/reservations/${rawUID}`;
+      }
+      if (platform?.includes('airbnb')) {
+        bookingLink = 'https://www.airbnb.com/hosting/reservations';
+      }
+      if (platform?.includes('hipcamp')) {
+        bookingLink = 'View this booking by logging into your Hipcamp host dashboard.';
+      }
+      if (platform?.includes('camplify')) {
+        bookingLink = 'Log in to your Camplify host dashboard to view booking details.';
+      }
+      if (platform?.includes('yescapa')) {
+        bookingLink = 'Log in to your Yescapa dashboard to view booking details.';
+      }
 
-  // RVshare 
-  if (platform?.includes('rvshare') && rawUID.length > 10 && !rawUID.includes('Booking')) {
-    bookingLink = `https://rvshare.com/dashboard/reservations`;
-  }
-
-  // Outdoorsy 
-  if (platform?.includes('outdoorsy') && rawUID.includes('Booking')) {
-    const match = rawUID.match(/(\d{6,})/);
-    if (match) {
-      bookingLink = `https://www.outdoorsy.com/dashboard/bookings/${match[1]}`;
-    }
-
-    // Rvezy 
-    if (platform?.includes('rvezy') && rawUID.length > 10) {
-  bookingLink = `https://www.rvezy.com/owner/reservations/${rawUID}`;
-    }
-
-    // Airbnb
-    if (platform?.includes('airbnb')) {
-  bookingLink = 'https://www.airbnb.com/hosting/reservations';
-    }
-
-    // Hipcamp
-    if (platform?.includes('hipcamp')) {
-  bookingLink = 'View this booking by logging into your Hipcamp host dashboard.';
-    }
-
-    // Camplify
-    if (platform?.includes('camplify')) {
-  bookingLink = 'Log in to your Camplify host dashboard to view booking details.';
-    }
-
-    // Yescapa
-    if (platform?.includes('yescapa')) {
-  bookingLink = 'Log in to your Yescapa dashboard to view booking details.';
-    }
-}
-
-
- 
       const summary = [booking.source_platform, booking.summary].filter(Boolean).join(', ') || 'booking';
       const descriptionParts = [];
       if (booking.description) descriptionParts.push(booking.description);
@@ -81,8 +62,8 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
       calendar.createEvent({
         start: booking.start_date,
         end: booking.end_date,
-        summary: `${booking.source_platform}, ${booking.summary}` || 'booking',
-        description: `${booking.description || ''}${bookingLink ? `\nBooking Link: ${bookingLink}` : ''}`,
+        summary,
+        description,
         location: booking.location || '',
         uid,
         sequence: 1,
@@ -90,29 +71,20 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
       });
     });
 
-    
-    // Save Render .ics link to Xano
-try {
-const XANO_API_POST_RENDER_ICAL = process.env.XANO_API_POST_RENDER_ICAL;
-const renderUrl = `https://kampsync-ical-generator.onrender.com/api/calendar/${listingId}.ics`;
-
-if (!XANO_API_POST_RENDER_ICAL) {
-  console.warn('Missing POST URL for Xano update, skipping...');
-} else {
-  try {
-    await axios.post(XANO_API_POST_RENDER_ICAL, {
-      listing_id: listingId,
-      ical_data: renderUrl
-    });
-  } catch (xanoErr) {
-    console.error('Failed to update Xano ical_data:', xanoErr.message || xanoErr);
-  }
-}
-
-
-} catch (xanoErr) {
-  console.error('Failed to update Xano ical_data:', xanoErr.message || xanoErr);
-}
+    // Push render .ics URL to Xano
+    if (!XANO_API_POST_RENDER_ICAL) {
+      console.warn('Missing POST URL for Xano update, skipping...');
+    } else {
+      const renderUrl = `https://kampsync-ical-generator.onrender.com/api/calendar/${listingId}.ics`;
+      try {
+        await axios.post(XANO_API_POST_RENDER_ICAL, {
+          listing_id: listingId,
+          ical_data: renderUrl
+        });
+      } catch (xanoErr) {
+        console.error('Failed to update Xano ical_data:', xanoErr.message || xanoErr);
+      }
+    }
 
     res.setHeader('Content-Type', 'text/calendar');
     res.setHeader('Content-Disposition', `inline; filename=listing_${listingId}.ics`);
