@@ -105,7 +105,6 @@ try {
 
 res.send(calendarString);
 
-});
 
 app.listen(PORT, () => {
   console.log(`KampSync calendar service running on port ${PORT}`);
