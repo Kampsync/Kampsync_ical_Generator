@@ -93,6 +93,7 @@ if (!XANO_API_POST_RENDER_ICAL) {
 
 res.setHeader('Content-Type', 'text/calendar');
 res.setHeader('Content-Disposition', `inline; filename=listing_${listingId}.ics`);
+
 const filename = `listing_${listingId}.ics`;
 const calendarString = calendar.toString();
 
@@ -104,8 +105,7 @@ try {
 }
 
 res.send(calendarString);
-
-}); // ← THIS closes the route handler ✅
+}); // ← THIS closes app.get()
 
 app.listen(PORT, () => {
   console.log(`KampSync calendar service running on port ${PORT}`);
