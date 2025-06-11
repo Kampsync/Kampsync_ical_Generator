@@ -14,6 +14,15 @@ const XANO_API_POST_RENDER_ICAL = process.env.XANO_API_POST_RENDER_ICAL;
 app.get('/api/calendar/:listingId.ics', async (req, res) => {
   const { listingId } = req.params;
 
+  // 🔧 TEMP: GCS test upload
+const testFilename = `test_${Date.now()}.ics`;
+try {
+  await uploadToGCS(testFilename, 'BEGIN:VCALENDAR\nVERSION:2.0\nEND:VCALENDAR');
+  console.log(`✅ GCS test upload succeeded: ${testFilename}`);
+} catch (e) {
+  console.error('❌ GCS test upload failed:', e.message || e);
+}
+
   if (!listingId || !XANO_API_BASE_URL) {
     return res.status(400).send("Missing required parameters or config");
   }
