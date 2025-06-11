@@ -5,18 +5,19 @@ const bucketName = process.env.GCLOUD_BUCKET;
 const storage = new Storage();
 
 async function uploadToGCS(filename, contents) {
-  if (!bucketName) throw new Error('Missing GCLOUD_BUCKET in environment');
+  if (!bucketName) throw new Error('❌ Missing GCLOUD_BUCKET in environment');
 
-  const bucket = storage.bucket(bucketName);
-  const file = bucket.file(filename);
+  const file = storage.bucket(bucketName).file(filename);
 
   try {
     await file.save(contents, {
-      metadata: { contentType: 'text/calendar' },
+      contentType: 'text/calendar',
       resumable: false,
-      public: true
+      public: true,
     });
-    console.log(`✅ Uploaded to GCS: ${filename}`);
+
+    console.log(`✅ GCS file uploaded via save(): ${filename}`);
+    console.log(`🌐 Public URL: https://storage.googleapis.com/${bucketName}/${filename}`);
   } catch (err) {
     console.error('❌ GCS upload failed:', err.message || err);
     throw err;
