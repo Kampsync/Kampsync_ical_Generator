@@ -1,34 +1,24 @@
 // gcsUploader.js
 const { Storage } = require('@google-cloud/storage');
-const path = require('path');
 
-const bucketName = process.env.GCS_BUCKET_NAME;
+const bucketName = process.env.GCLOUD_BUCKET;
 const storage = new Storage();
 
 async function uploadToGCS(filename, contents) {
-  if (!bucketName) throw new Error('Missing GCS_BUCKET_NAME in environment');
+  if (!bucketName) throw new Error('Missing GCLOUD_BUCKET in environment');
 
   const file = storage.bucket(bucketName).file(filename);
-  const stream = file.createWriteStream({
-    metadata: {
-      contentType: 'text/calendar'
-    },
-    resumable: false
-  });
 
-  return new Promise((resolve, reject) => {
-    stream.on('error', (err) => {
-      console.error('❌ GCS stream error:', err.message || err);
-      reject(err);
+  try {
+    await file.save(contents, {
+      contentType: 'text/calendar',
+      resumable: false,
     });
-
-    stream.on('finish', () => {
-      console.log(`✅ GCS file written: ${filename}`);
-      resolve();
-    });
-
-    stream.end(contents);
-  });
+    console.log(`✅ GCS file uploaded via save(): ${filename}`);
+  } catch (err) {
+    console.error('❌ GCS upload failed:', err.message || err);
+    throw err;
+  }
 }
 
 module.exports = { uploadToGCS };
