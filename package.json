@@ -10,6 +10,7 @@
     "ical-generator": "^3.6.1",
     "axios": "^1.6.7",
     "date-fns": "^3.6.0",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "@google-cloud/storage": "^7.13.2"
   }
 }
