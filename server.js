@@ -95,14 +95,16 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
     res.setHeader('Content-Disposition', `inline; filename=listing_${listingId}.ics`);
     const filename = `listing_${listingId}.ics`;
     const calendarString = calendar.toString();
-    console.log(`🟢 Uploaded to GCS: ${filename}`);
-  } 
-  try {
-  await uploadToGCS(filename, calendarString);
-  console.log(`✅ Uploaded to GCS: ${filename}`);
-} catch (err) {
-  console.error('❌ GCS upload failed:', err.message || err);
+
+try {
+    await uploadToGCS(filename, calendarString);
+    console.log(`✅ Uploaded to GCS: ${filename}`);
+}   catch (err) {
+    console.error('❌ GCS upload failed:', err.message || err);
 }
+
+res.send(calendarString);
+
 });
 
 app.listen(PORT, () => {
