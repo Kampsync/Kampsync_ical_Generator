@@ -7,24 +7,27 @@ const bucket = storage.bucket(process.env.GCLOUD_BUCKET);
 async function uploadToGCS(filename, contents) {
   const file = bucket.file(filename);
 
-  const stream = file.createWriteStream({
-    metadata: {
-      contentType: 'text/calendar',
-    },
-    public: true,
-    resumable: false,
-  });
-
   return new Promise((resolve, reject) => {
+    const stream = file.createWriteStream({
+      metadata: {
+        contentType: 'text/calendar',
+      },
+      resumable: false,
+      public: true,
+    });
+
     stream.on('error', (err) => {
+      console.error('❌ GCS stream error:', err.message || err);
       reject(err);
     });
 
     stream.on('finish', () => {
+      console.log(`✅ GCS upload complete: ${filename}`);
       resolve();
     });
 
-    stream.end(Buffer.from(contents, 'utf8'));
+    // Explicitly buffer the string as UTF-8
+    stream.end(Buffer.from(contents, 'utf-8'));
   });
 }
 
