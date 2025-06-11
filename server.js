@@ -3,7 +3,6 @@ const express = require('express');
 const axios = require('axios');
 const ical = require('ical-generator');
 const { v5: uuidv5 } = require('uuid');
-const { uploadToGCS } = require('./gcsUploader');
 
 const app = express();
 
@@ -13,15 +12,6 @@ const XANO_API_POST_RENDER_ICAL = process.env.XANO_API_POST_RENDER_ICAL;
 
 app.get('/api/calendar/:listingId.ics', async (req, res) => {
   const { listingId } = req.params;
-
-  // 🔧 TEMP: GCS test upload
-const testFilename = `test_${Date.now()}.ics`;
-try {
-  await uploadToGCS(testFilename, 'BEGIN:VCALENDAR\nVERSION:2.0\nEND:VCALENDAR');
-  console.log(`✅ GCS test upload succeeded: ${testFilename}`);
-} catch (e) {
-  console.error('❌ GCS test upload failed:', e.message || e);
-}
 
   if (!listingId || !XANO_API_BASE_URL) {
     return res.status(400).send("Missing required parameters or config");
@@ -78,16 +68,9 @@ try {
     const filename = `listing_${listingId}.ics`;
     const calendarString = calendar.toString();
 
-    try {
-      await uploadToGCS(filename, calendarString);
-      console.log(`✅ Uploaded to GCS: ${filename}`);
-    } catch (err) {
-      console.error('❌ GCS upload failed:', err.message || err);
-    }
-
+    // Send to Xano the permanent ICS route
     if (XANO_API_POST_RENDER_ICAL) {
       const renderUrl = `https://kampsync-ical-generator.onrender.com/api/calendar/${listingId}.ics`;
-      console.log('📤 Posting to Xano:', renderUrl);
       try {
         await axios.post(XANO_API_POST_RENDER_ICAL, {
           listing_id: parseInt(listingId, 10),
