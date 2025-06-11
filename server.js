@@ -34,24 +34,18 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
 
       if (platform?.includes('rvshare') && rawUID.length > 10 && !rawUID.includes('Booking')) {
         bookingLink = `https://rvshare.com/dashboard/reservations`;
-      }
-      if (platform?.includes('outdoorsy') && rawUID.includes('Booking')) {
+      } else if (platform?.includes('outdoorsy') && rawUID.includes('Booking')) {
         const match = rawUID.match(/(\d{6,})/);
         if (match) bookingLink = `https://www.outdoorsy.com/dashboard/bookings/${match[1]}`;
-      }
-      if (platform?.includes('rvezy') && rawUID.length > 10) {
+      } else if (platform?.includes('rvezy') && rawUID.length > 10) {
         bookingLink = `https://www.rvezy.com/owner/reservations/${rawUID}`;
-      }
-      if (platform?.includes('airbnb')) {
+      } else if (platform?.includes('airbnb')) {
         bookingLink = 'https://www.airbnb.com/hosting/reservations';
-      }
-      if (platform?.includes('hipcamp')) {
+      } else if (platform?.includes('hipcamp')) {
         bookingLink = 'View this booking by logging into your Hipcamp host dashboard.';
-      }
-      if (platform?.includes('camplify')) {
+      } else if (platform?.includes('camplify')) {
         bookingLink = 'Log in to your Camplify host dashboard to view booking details.';
-      }
-      if (platform?.includes('yescapa')) {
+      } else if (platform?.includes('yescapa')) {
         bookingLink = 'Log in to your Yescapa dashboard to view booking details.';
       }
 
@@ -59,13 +53,12 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
       const descriptionParts = [];
       if (booking.description) descriptionParts.push(booking.description);
       if (bookingLink) descriptionParts.push(`Booking Link: ${bookingLink}`);
-      const description = descriptionParts.join('\n');
 
       calendar.createEvent({
         start: booking.start_date,
         end: booking.end_date,
         summary,
-        description,
+        description: descriptionParts.join('\n'),
         location: booking.location || '',
         uid,
         sequence: 1,
@@ -76,7 +69,6 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
     const filename = `listing_${listingId}.ics`;
     const calendarString = calendar.toString();
 
-    // Upload to GCS
     try {
       await uploadToGCS(filename, calendarString);
       console.log(`✅ Uploaded to GCS: ${filename}`);
@@ -84,7 +76,6 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
       console.error('❌ GCS upload failed:', err.message || err);
     }
 
-    // Push .ics URL to Xano
     if (XANO_API_POST_RENDER_ICAL) {
       const renderUrl = `https://kampsync-ical-generator.onrender.com/api/calendar/${listingId}.ics`;
       console.log('📤 Posting to Xano:', renderUrl);
@@ -102,7 +93,6 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
     res.setHeader('Content-Type', 'text/calendar');
     res.setHeader('Content-Disposition', `inline; filename=${filename}`);
     res.send(calendarString);
-
   } catch (err) {
     console.error('❌ Server error:', err.message || err);
     res.status(500).send('Internal Server Error');
