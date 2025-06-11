@@ -2,16 +2,29 @@
 const { Storage } = require('@google-cloud/storage');
 
 const storage = new Storage();
-const bucketName = process.env.GCLOUD_BUCKET;
-const bucket = storage.bucket(bucketName);
+const bucket = storage.bucket(process.env.GCLOUD_BUCKET);
 
 async function uploadToGCS(filename, contents) {
   const file = bucket.file(filename);
 
-  await file.save(Buffer.from(contents, 'utf8'), {
-    contentType: 'text/calendar',
+  const stream = file.createWriteStream({
+    metadata: {
+      contentType: 'text/calendar',
+    },
     public: true,
     resumable: false,
+  });
+
+  return new Promise((resolve, reject) => {
+    stream.on('error', (err) => {
+      reject(err);
+    });
+
+    stream.on('finish', () => {
+      resolve();
+    });
+
+    stream.end(Buffer.from(contents, 'utf8'));
   });
 }
 
