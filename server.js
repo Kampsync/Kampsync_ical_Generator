@@ -2,6 +2,7 @@ const express = require('express');
 const axios = require('axios');
 const ical = require('ical-generator');
 const { v5: uuidv5 } = require('uuid');
+const { uploadToGCS } = require('./gcsUploader');
 
 const app = express();
 
@@ -92,11 +93,15 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
 
     res.setHeader('Content-Type', 'text/calendar');
     res.setHeader('Content-Disposition', `inline; filename=listing_${listingId}.ics`);
-    res.send(calendar.toString());
-  } catch (err) {
-    console.error('Calendar generation error:', err.message || err);
-    res.status(500).send('Internal server error');
-  }
+    const filename = `listing_${listingId}.ics`;
+    const calendarString = calendar.toString();
+    console.log(`🟢 Uploaded to GCS: ${filename}`);
+  } try {
+    await uploadToGCS(filename, calendarString);
+    console.log(`✅ Uploaded to GCS: ${filename}`);
+}   catch (err) {
+  console.error('❌ GCS upload failed:', err.message || err);
+}
 });
 
 app.listen(PORT, () => {
