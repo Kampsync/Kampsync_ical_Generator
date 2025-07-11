@@ -46,6 +46,14 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
         bookingLink = 'Log in to your Camplify host dashboard to view booking details.';
       } else if (platform?.includes('yescapa')) {
         bookingLink = 'Log in to your Yescapa dashboard to view booking details.';
+      } else if (platform?.includes('harvesthost')) {
+        bookingLink = 'https://harvesthosts.com/dashboard/';
+      } else if (platform?.includes('boondockers')) {
+        bookingLink = 'https://www.boondockerswelcome.com/hosts/dashboard/';
+      } else if (platform?.includes('pitchup')) {
+        bookingLink = 'Log in to your Pitchup dashboard to view booking details.';
+      } else if (platform?.includes('safarinow')) {
+        bookingLink = 'Log in to your SafariNow dashboard to view booking details.';
       }
 
       const summary = [booking.source_platform, booking.summary].filter(Boolean).join(', ') || 'booking';
@@ -68,7 +76,6 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
     const filename = `listing_${listingId}.ics`;
     const calendarString = calendar.toString();
 
-    // Send to Xano the permanent ICS route
     if (XANO_API_POST_RENDER_ICAL) {
       const renderUrl = `https://kampsync-ical-generator.onrender.com/api/calendar/${listingId}.ics`;
       try {
@@ -76,9 +83,9 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
           listing_id: parseInt(listingId, 10),
           ical_data: renderUrl
         });
-        console.log('✅ Successfully posted to Xano');
+        console.log('Successfully posted to Xano');
       } catch (err) {
-        console.error('❌ Failed to post to Xano:', err.response?.data || err.message);
+        console.error('Failed to post to Xano:', err.response?.data || err.message);
       }
     }
 
@@ -86,7 +93,7 @@ app.get('/api/calendar/:listingId.ics', async (req, res) => {
     res.setHeader('Content-Disposition', `inline; filename=${filename}`);
     res.send(calendarString);
   } catch (err) {
-    console.error('❌ Server error:', err.message || err);
+    console.error('Server error:', err.message || err);
     res.status(500).send('Internal Server Error');
   }
 });
